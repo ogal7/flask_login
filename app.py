@@ -1,14 +1,13 @@
 #!/usr/bin/python
-from flask import Flask, render_template, request, sessions
+from flask import Flask, render_template, request, session, redirect, url_for
 import csv 
 
 app = Flask(__name__)
-APP.secret_key = '\xbc!<\xf2\x9eW1\rm\xc4=\xc8\x90b\x8d?iA\xdf\x98'
+app.secret_key = '\xbc!<\xf2\x9eW1\rm\xc4=\xc8\x90b\x8d?iA\xdf\x98'
 
 
 
 def auth():
-   message = ""
    #print request.form
    with open('logininfo.csv','r') as csvfile:
         reader = csv.reader(csvfile)
@@ -20,7 +19,8 @@ def auth():
                     message = "doesn't match"
             else:
                 message = "doesn't exist"
-    return message
+        csvfile.close()
+        return message
 
 def create():
     #check if user already created
@@ -41,42 +41,43 @@ def create():
 
 
 @app.route('/')
-    #if logged in 
+def dipsy():
     if len(session.keys()) != 0:  
-        return redirect(url_for('welcome'))#already logged in
+        return redirect(url_for('bigbird'))#already logged in
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('elmo'))
 
 
 @app.route('/login/')
-    render_template('login.html', message = "")
+def elmo():
+    return render_template('login.html', message = "")
 
 
 @app.route('/welcome/')
-    render_template('welcome.html')
+def bigbird():
+    return render_template('welcome.html')
+
+
+@app.route('/logout/', methods = ['POST'])
+def tinkiewinkie():
+    session.pop('user')
+    return redirect(url_for('elmo'))
 
 
 @app.route("/auth/", methods = ['POST'])
-    def poe():
-        x = auth()
+def poe():
+    x = auth()
     if (x == 'matches'):
         session['user'] = "yes"#logged in 
-        redirect(url_for('welcome'))
+        return redirect(url_for('bigbird'))
     else: 
-        render_template('login.html', message = x)
+        return render_template('login.html', message = x)
 
 
 @app.route("/create/", methods = ['POST'])
-    def lala():
-        x = create()
-    if (x == 'creation successful'):
-        render_template('login.html', message = "account creation successful! you can try logging in now")
-    else:
-        render_template('login.html', message = x)
-
-
-
-
+def lala():
+    y = create()
+    return render_template('login.html', message = y)
 
 
 if __name__ == '__main__':
