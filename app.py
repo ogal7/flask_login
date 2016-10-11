@@ -36,6 +36,7 @@ def create():
         ww = csv.writer(csvfile)
         ww.writerow(info2Enter)
         message = "creation successful"
+    csvfile.close()
     return message
 
 
